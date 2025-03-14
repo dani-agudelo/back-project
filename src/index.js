@@ -15,3 +15,10 @@ app.use(bodyParser.json());
 app.use("/api/v1", routes);
 
 connnectionDB();
+
+
+/**
+Notas: 
+Index es el archivo principal de la aplicación, es el punto de entrada de la aplicación.
+*/
+
