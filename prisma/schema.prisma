@@ -14,14 +14,17 @@ datasource db {
 }
 
 model Users {
-  id               String   @id @default(auto()) @map("_id") @db.ObjectId
-  fullname         String
-  email            String   @unique
-  current_password String
-  role             Role     @default(EDITOR)
-  status           Status   @default(ACTIVE)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id                      String    @id @default(auto()) @map("_id") @db.ObjectId
+  fullname                String
+  email                   String    @unique
+  current_password        String
+  role                    Role      @default(EDITOR)
+  verificationCode        String?
+  verificationCodeExpires DateTime?
+  status                  Status    @default(PENDING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum Role {
@@ -32,14 +35,10 @@ enum Role {
 enum Status {
   ACTIVE
   INACTIVE
+  PENDING
 }
 
-
-
-
 /**
-Notas: 
-@default se usa para 
-
-
-*/
+ * Notas:
+ * @default se usa para
+ */
