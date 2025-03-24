@@ -5,18 +5,18 @@ const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 
-// Configuracion de nodemailer
+// Configuración del transporte de correo electrónico, se hará usando Gmail
 const transporter = nodemailer.createTransport({
-  host: "smtp.ucaldas.edu.co",
+  host: "smtp.gmail.com",
   port: 465,
-  secure: true,
+  secure: true, // use SSL
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    pass: process.env.EMAIL_PASSWORD,
   },
 });
 
-// Función para generar un código aleatorio
+// Función para generar un código aleatorio de 6 dígitos para verificar la cuenta
 const generateVerificationCode = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
@@ -52,9 +52,9 @@ const sendVerificationEmail = async (email, code, fullname) => {
   }
 };
 
+// Función para registrar un nuevo usuario
 const signUp = async (req, res) => {
   let { fullname, email, current_password } = req.body;
-  console.log(req.body);
 
   if (email) {
     email = email.toLowerCase().trim();
@@ -67,6 +67,7 @@ const signUp = async (req, res) => {
     });
   }
 
+  // Validate email format
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     return res.status(400).json({
@@ -74,12 +75,14 @@ const signUp = async (req, res) => {
     });
   }
 
+  // Validate password length
   if (current_password.length < 6) {
     return res.status(400).json({
-      message: "Password must be at least 6 characteres long",
+      message: "Password must be at least 6 characters long",
     });
   }
 
+  // Verificar si el correo electrónico ya está registrado
   try {
     const existinguser = await prisma.users.findUnique({
       where: { email },
@@ -89,61 +92,65 @@ const signUp = async (req, res) => {
     // El usuario ya existe
     if (existinguser) {
       return res.status(400).json({
-        message: "Email allready registered",
+        message: "Email already registered",
       });
     }
 
+    // Encriptar la contraseña
     const hashedPassword = await bcrypt.hash(current_password, 10);
 
-    // Generar código de verificación
+    // Generar código de verificación, el de 6 dígitos
     const verificationCode = generateVerificationCode();
     const expirationTime = new Date();
-    expirationTime.setMinutes(expirationTime.getMinutes() + 15); // 15 minutos de expiración
+    expirationTime.setMinutes(expirationTime.getMinutes() + 15); // Expira en 15 minutos
 
+    // Guardar usuario con estado pendiente y código de verificación
     const user = await prisma.users.create({
       data: {
         fullname,
         email,
         current_password: hashedPassword,
         status: "PENDING",
-        verification_code,
+        verificationCode,
         verificationCodeExpires: expirationTime,
       },
     });
 
-    // Enviar correo electrónico con el código de verificación
+    // Enviar correo con código de verificación
     const emailSent = await sendVerificationEmail(
       email,
       verificationCode,
       fullname
     );
+
     if (!emailSent) {
-      // Si falla el envío de correo, eliminamos el usuario creado
+      // Si falla el envío del correo, eliminamos el usuario creado
       await prisma.users.delete({
         where: { id: user.id },
       });
 
       return res.status(500).json({
-        message: "Error sending verification email. Please try again later",
+        message: "Failed to send verification email. Please try again later.",
       });
     }
 
+    // No enviamos el código ni datos sensibles en la respuesta
     res.status(201).json({
       message:
-        "User created successfull. Please check your email for verification code",
+        "User registered successfully. Please check your email for verification code.",
       userId: user.id,
       email: user.email,
     });
   } catch (error) {
     console.log("Error details:", error);
-
     res.status(500).json({
       message: "User was not created",
-      error,
+      error: error.message,
     });
   }
 };
 
+// Nueva función para verificar el código de autenticación
 const verifyCode = async (req, res) => {
   const { email, code } = req.body;
 
@@ -219,6 +226,7 @@ const verifyCode = async (req, res) => {
   }
 };
 
+// Función para reenviar el código de verificación
 const resendVerificationCode = async (req, res) => {
   const { email } = req.body;
 
@@ -259,7 +267,11 @@ const resendVerificationCode = async (req, res) => {
     });
 
     // Enviar nuevo código por correo
-    const emailSent = await sendVerificationEmail(email, newCode, user.fullname);
+    const emailSent = await sendVerificationEmail(
+      email,
+      newCode,
+      user.fullname
+    );
 
     if (!emailSent) {
       return res.status(500).json({
@@ -270,7 +282,6 @@ const resendVerificationCode = async (req, res) => {
     res.status(200).json({
       message: "Verification code sent successfully. Please check your email.",
     });
-
   } catch (error) {
     console.log("Error resending code:", error);
     res.status(500).json({
@@ -280,7 +291,7 @@ const resendVerificationCode = async (req, res) => {
   }
 };
 
-
+// Función para iniciar sesión
 const signIn = async (req, res) => {
   let { email, current_password } = req.body;
   console.log(req.body);
@@ -296,6 +307,7 @@ const signIn = async (req, res) => {
     });
   }
 
+  // Validate email format
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     return res.status(400).json({
@@ -315,6 +327,7 @@ const signIn = async (req, res) => {
       });
     }
 
+    // Verify password
     const validatePassword = await bcrypt.compare(
       current_password,
       findUser.current_password
@@ -326,6 +339,7 @@ const signIn = async (req, res) => {
       });
     }
 
+    // Generate token
     const token = jwt.sign(
       {
         id: findUser.id,
@@ -350,4 +364,5 @@ module.exports = {
   signUp,
   signIn,
   verifyCode,
+  resendVerificationCode,
 };

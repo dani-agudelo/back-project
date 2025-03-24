@@ -19,12 +19,11 @@ model Users {
   email                   String    @unique
   current_password        String
   role                    Role      @default(EDITOR)
+  status                  Status    @default(PENDING)
   verificationCode        String?
   verificationCodeExpires DateTime?
-  status                  Status    @default(PENDING)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
 }
 
 enum Role {
@@ -37,8 +36,3 @@ enum Status {
   INACTIVE
   PENDING
 }
-
-/**
- * Notas:
- * @default se usa para
- */
