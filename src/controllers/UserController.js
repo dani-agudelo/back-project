@@ -1,6 +1,10 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
+/**
+ * Obtiene todos los usuarios de la base de datos.
+ *
+ */
 const getAllUsers = async (req, res) => {
   try {
     const users = await prisma.users.findMany();
@@ -14,6 +18,10 @@ const getAllUsers = async (req, res) => {
   }
 };
 
+/**
+ * Obtiene un usuario por su ID.
+ *
+ */
 const getUserById = async (req, res) => {
   const { id } = req.params;
   try {

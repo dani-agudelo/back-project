@@ -115,13 +115,17 @@ const signUp = async (req, res) => {
         verificationCodeExpires: expirationTime,
       },
     });
+    console.log("Nodemailer transport:", nodemailer.createTransport);
+    console.log("SendMail function:", nodemailer.createTransport().sendMail);
 
     // Enviar correo con código de verificación
+    console.log("Calling sendVerificationEmail...");
     const emailSent = await sendVerificationEmail(
       email,
       verificationCode,
       fullname
     );
+    console.log("Email sent status:", emailSent);
 
     if (!emailSent) {
       // Si falla el envío del correo, eliminamos el usuario creado
@@ -224,6 +228,7 @@ const verifyCode = async (req, res) => {
       error: error.message,
     });
   }
+  
 };
 
 // Función para reenviar el código de verificación
