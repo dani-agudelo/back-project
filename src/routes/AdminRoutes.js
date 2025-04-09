@@ -12,15 +12,12 @@ const {
   getDashboard,
   processCsv,
   validateCsv,
+  getCitiesAndDepartments,
 } = require("../controllers/AdminController");
 
 const router = express.Router();
 
-// Ruta para subir archivos (solo SUPERADMIN)
-router.post("/upload", authorizeRole("SUPERADMIN"), uploadFile);
-// Ruta para acceder al dashboard (solo SUPERADMIN)
 router.get("/dashboard", authorizeRole("SUPERADMIN"), getDashboard);
-// Ruta para procesar el archivo CSV (solo SUPERADMIN)
 router.post(
   "/process-csv",
   authorizeRole("SUPERADMIN"),
@@ -28,12 +25,17 @@ router.post(
   processCsv
 );
 
-// Ruta para validar el archivo CSV (solo SUPERADMIN)
 router.post(
   "/validate-csv",
   authorizeRole("SUPERADMIN"),
   upload.single("file"),
   validateCsv
 );
+
+router.get(
+    "/get-cities",
+    authorizeRole("SUPERADMIN"),
+    getCitiesAndDepartments
+)
 
 module.exports = router;

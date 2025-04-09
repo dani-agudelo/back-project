@@ -7,16 +7,6 @@ const csv = require("csv-parser");
 const { Readable } = require("stream");
 const iconv = require("iconv-lite");
 
-const uploadFile = async (req, res) => {
-  try {
-    res.status(200).json({ message: "File uploaded successfully." });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Failed to upload file.", error: error.message });
-  }
-};
-
 const getDashboard = async (req, res) => {
   try {
     res.status(200).json({ message: "Welcome to the SUPERADMIN dashboard." });
@@ -27,6 +17,10 @@ const getDashboard = async (req, res) => {
   }
 };
 
+/**
+ * Procesa el archivo CSV subido por el usuario.
+ *
+ */
 const processCsv = async (req, res) => {
   console.log("📥 Archivo recibido:", req.file);
   try {
@@ -175,9 +169,52 @@ const validateCsv = async (req, res) => {
   }
 };
 
+/**
+ * Obtiene las ciudades y departamentos de la base de datos.
+ * Permite paginación de los resultados.
+ */
+const getCitiesAndDepartments = async (req, res) => {
+  try {
+    const { page = 1, limit = 10 } = req.query; // Parámetros de paginación (valores predeterminados: página 1, 10 elementos por página)
+
+    const skip = (page - 1) * limit; // Calcular cuántos registros omitir
+    const take = parseInt(limit); // Número de registros a devolver
+
+    // Obtener ciudades con sus departamentos
+    const cities = await prisma.cities.findMany({
+      skip,
+      take,
+      include: {
+        department: true, // Incluir información del departamento relacionado
+      },
+    });
+
+    // Contar el total de ciudades para calcular el número total de páginas
+    const totalCities = await prisma.cities.count();
+    const totalPages = Math.ceil(totalCities / limit);
+
+    res.status(200).json({
+      message: "Cities and departments retrieved successfully",
+      data: cities,
+      pagination: {
+        currentPage: parseInt(page),
+        totalPages,
+        totalCities,
+        limit: parseInt(limit),
+      },
+    });
+  } catch (error) {
+    console.error("Error retrieving cities and departments:", error);
+    res.status(500).json({
+      message: "Failed to retrieve cities and departments",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
-  uploadFile,
   getDashboard,
   processCsv,
   validateCsv,
+  getCitiesAndDepartments
 };
