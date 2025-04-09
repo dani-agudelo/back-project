@@ -9,16 +9,6 @@ const iconv = require("iconv-lite");
 const fs = require("fs");
 const path = require("path");
 
-const getDashboard = async (req, res) => {
-  try {
-    res.status(200).json({ message: "Welcome to the SUPERADMIN dashboard." });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Failed to load dashboard.", error: error.message });
-  }
-};
-
 /**
  * Procesa el archivo CSV subido por el usuario.
  *
@@ -35,7 +25,6 @@ const processCsv = async (req, res) => {
 
     const departmentsMap = new Map();
     const citiesDataRaw = [];
-    const logs = []; // Array para almacenar los logs
 
     stream
       .pipe(csv())
@@ -59,7 +48,6 @@ const processCsv = async (req, res) => {
       })
       .on("end", async () => {
         try {
-          console.log("🧠 Verificando y procesando departamentos...");
           const departments = Array.from(departmentsMap.values());
           const existingDepartments = await prisma.departments.findMany({
             where: {
@@ -79,22 +67,8 @@ const processCsv = async (req, res) => {
             await prisma.departments.create({
               data: { name: dept.name },
             });
-            logs.push({
-              action: "create",
-              entity: "department",
-              message: `Department '${dept.name}' created successfully.`,
-            });
           }
 
-          logs.push(
-            ...existingDepartments.map((dept) => ({
-              action: "exists",
-              entity: "department",
-              message: `Department '${dept.name}' already exists.`,
-            }))
-          );
-
-          console.log("🔍 Verificando ciudades...");
           const allDepartments = await prisma.departments.findMany();
           const departmentIdMap = new Map();
           allDepartments.forEach((dept) => {
@@ -110,11 +84,6 @@ const processCsv = async (req, res) => {
                   departmentId,
                 };
               }
-              logs.push({
-                action: "error",
-                entity: "city",
-                message: `City '${city.name}' could not be created because department '${city.department}' does not exist.`,
-              });
               return null;
             })
             .filter(Boolean);
@@ -137,39 +106,20 @@ const processCsv = async (req, res) => {
             await prisma.cities.create({
               data: city,
             });
-            logs.push({
-              action: "create",
-              entity: "city",
-              message: `City '${city.name}' created successfully.`,
-            });
           }
-
-          logs.push(
-            ...existingCities.map((city) => ({
-              action: "exists",
-              entity: "city",
-              message: `City '${city.name}' already exists.`,
-            }))
-          );
-
-          // Guardar los logs en la base de datos
-          await prisma.logs.createMany({ data: logs });
 
           res.status(200).json({
             message: "CSV processed successfully",
-            logs,
             missingDepartments: missingDepartments.map((dept) => dept.name),
             missingCities: missingCities.map((city) => city.name),
           });
         } catch (error) {
-          console.error("❌ Error al guardar datos:", error);
           res
             .status(500)
             .json({ message: "Failed to save data", error: error.message });
         }
       });
   } catch (error) {
-    console.error("❌ Error al procesar CSV:", error);
     res
       .status(500)
       .json({ message: "Error processing CSV", error: error.message });
@@ -288,7 +238,6 @@ const getCitiesAndDepartments = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error retrieving cities and departments:", error);
     res.status(500).json({
       message: "Failed to retrieve cities and departments",
       error: error.message,
@@ -296,49 +245,8 @@ const getCitiesAndDepartments = async (req, res) => {
   }
 };
 
-/**
- * Obtiene los logs de la base de datos.
- *
- */
-const getLogs = async (req, res) => {
-  try {
-    const { page = 1, limit = 10 } = req.query;
-
-    const skip = (page - 1) * limit;
-    const take = parseInt(limit);
-
-    const logs = await prisma.logs.findMany({
-      skip,
-      take,
-      orderBy: { createdAt: "desc" },
-    });
-
-    const totalLogs = await prisma.logs.count();
-    const totalPages = Math.ceil(totalLogs / limit);
-
-    res.status(200).json({
-      message: "Logs retrieved successfully",
-      data: logs,
-      pagination: {
-        currentPage: parseInt(page),
-        totalPages,
-        totalLogs,
-        limit: parseInt(limit),
-      },
-    });
-  } catch (error) {
-    console.error("Error retrieving logs:", error);
-    res.status(500).json({
-      message: "Failed to retrieve logs",
-      error: error.message,
-    });
-  }
-};
-
 module.exports = {
-  getDashboard,
   processCsv,
   validateCsv,
   getCitiesAndDepartments,
-  getLogs,
 };

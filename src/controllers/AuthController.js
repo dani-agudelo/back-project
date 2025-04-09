@@ -391,7 +391,7 @@ const verifyTwoFactorCode = async (req, res) => {
   }
 
   // Código correcto: generar token
-  const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "2h" });
+  const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "2h" });
 
   // Limpiar el código para seguridad
   await prisma.users.update({

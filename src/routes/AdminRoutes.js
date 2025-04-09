@@ -8,17 +8,13 @@ const { authorizeRole } = require("../middlewares/authMiddleware");
 const upload = require("../middlewares/uploadMiddleware");
 
 const {
-  uploadFile,
-  getDashboard,
   processCsv,
   validateCsv,
   getCitiesAndDepartments,
-  getLogs,
 } = require("../controllers/AdminController");
 
 const router = express.Router();
 
-router.get("/dashboard", authorizeRole("SUPERADMIN"), getDashboard);
 router.post(
   "/process-csv",
   authorizeRole("SUPERADMIN"),
@@ -38,10 +34,5 @@ router.get(
     authorizeRole("SUPERADMIN"),
     getCitiesAndDepartments
 )
-
-router.get(
-    "/logs", 
-    authorizeRole("SUPERADMIN"), 
-    getLogs);
 
 module.exports = router;
