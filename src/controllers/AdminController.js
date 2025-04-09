@@ -33,6 +33,7 @@ const processCsv = async (req, res) => {
 
     const departmentsMap = new Map();
     const citiesDataRaw = [];
+    const logs = []; // Array para almacenar los logs
 
     stream
       .pipe(csv())
@@ -60,11 +61,24 @@ const processCsv = async (req, res) => {
           const departments = Array.from(departmentsMap.values());
 
           for (const dept of departments) {
-            await prisma.departments.upsert({
-              where: { name: dept.name },
-              update: {},
-              create: { name: dept.name },
-            });
+            try {
+              await prisma.departments.upsert({
+                where: { name: dept.name },
+                update: {},
+                create: { name: dept.name },
+              });
+              logs.push({
+                action: "create",
+                entity: "department",
+                message: `Department '${dept.name}' created successfully.`,
+              });
+            } catch (error) {
+              logs.push({
+                action: "error",
+                entity: "department",
+                message: `Failed to create department '${dept.name}': ${error.message}`,
+              });
+            }
           }
 
           console.log("🔍 Obteniendo IDs de departamentos...");
@@ -84,18 +98,39 @@ const processCsv = async (req, res) => {
                   departmentId,
                 };
               }
+              logs.push({
+                action: "error",
+                entity: "city",
+                message: `City '${city.name}' could not be created because department '${city.department}' does not exist.`,
+              });
               return null;
             })
             .filter(Boolean); // Elimina nulos si algún departamento no se encontró
 
           console.log("💾 Insertando ciudades...");
           for (const city of citiesData) {
-            await prisma.cities.upsert({
-              where: { name: city.name },
-              update: {},
-              create: city,
-            });
+            try {
+              await prisma.cities.upsert({
+                where: { name: city.name },
+                update: {},
+                create: city,
+              });
+              logs.push({
+                action: "create",
+                entity: "city",
+                message: `City '${city.name}' created successfully.`,
+              });
+            } catch (error) {
+              logs.push({
+                action: "error",
+                entity: "city",
+                message: `Failed to create city '${city.name}': ${error.message}`,
+              });
+            }
           }
+
+          // Guardar los logs en la base de datos
+          await prisma.logs.createMany({ data: logs });
 
           res.status(200).json({
             message: "CSV processed successfully",
@@ -212,9 +247,49 @@ const getCitiesAndDepartments = async (req, res) => {
   }
 };
 
+/**
+ * Obtiene los logs de la base de datos.
+ *
+ */
+const getLogs = async (req, res) => {
+  try {
+    const { page = 1, limit = 10 } = req.query;
+
+    const skip = (page - 1) * limit;
+    const take = parseInt(limit);
+
+    const logs = await prisma.logs.findMany({
+      skip,
+      take,
+      orderBy: { createdAt: "desc" },
+    });
+
+    const totalLogs = await prisma.logs.count();
+    const totalPages = Math.ceil(totalLogs / limit);
+
+    res.status(200).json({
+      message: "Logs retrieved successfully",
+      data: logs,
+      pagination: {
+        currentPage: parseInt(page),
+        totalPages,
+        totalLogs,
+        limit: parseInt(limit),
+      },
+    });
+  } catch (error) {
+    console.error("Error retrieving logs:", error);
+    res.status(500).json({
+      message: "Failed to retrieve logs",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   getDashboard,
   processCsv,
   validateCsv,
-  getCitiesAndDepartments
+  getCitiesAndDepartments,
+  getLogs,
 };

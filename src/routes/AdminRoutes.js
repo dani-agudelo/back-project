@@ -13,6 +13,7 @@ const {
   processCsv,
   validateCsv,
   getCitiesAndDepartments,
+  getLogs,
 } = require("../controllers/AdminController");
 
 const router = express.Router();
@@ -37,5 +38,10 @@ router.get(
     authorizeRole("SUPERADMIN"),
     getCitiesAndDepartments
 )
+
+router.get(
+    "/logs", 
+    authorizeRole("SUPERADMIN"), 
+    getLogs);
 
 module.exports = router;
