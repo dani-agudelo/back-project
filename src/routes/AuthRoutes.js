@@ -5,11 +5,13 @@ const {
   signUp,
   verifyCode,
   resendVerificationCode,
+  verifyTwoFactorCode
 } = require("../controllers/AuthController");
 
 router.post("/signup", signUp);
 router.post("/signin", signIn);
 router.post("/verify", verifyCode);
 router.post("/resend", resendVerificationCode);
+router.post("/verify2fa", verifyTwoFactorCode )
 
 module.exports = router;
