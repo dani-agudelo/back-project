@@ -3,6 +3,7 @@ const prisma = new PrismaClient();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
+const { sendSMS } = require('../service/TwilioService');
 require("dotenv").config();
 
 // Configuración del transporte de correo electrónico, se hará usando Gmail
@@ -325,6 +326,7 @@ const signIn = async (req, res) => {
       where: { email },
     });
 
+    console.log("usuario", findUser)
     // Verify user exists
     if (!findUser) {
       return res.status(404).json({
@@ -337,6 +339,7 @@ const signIn = async (req, res) => {
       current_password,
       findUser.current_password
     );
+    console.log("contraseña", validatePassword)
 
     if (!validatePassword) {
       return res.status(400).json({
@@ -344,28 +347,65 @@ const signIn = async (req, res) => {
       });
     }
 
-    // Generate token
-    const token = jwt.sign(
-      {
-        id: findUser.id,
-        role: findUser.role,
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "2h",
-      }
-    );
-    console.log("Token generated:", token);
 
-    res.status(200).json({
-      message: "Login successfull",
-      token,
+    const code = generateVerificationCode();
+    const expires = new Date(Date.now() + 5 * 60000); // 5 minutos
+    // const expires = new Date(Date.now() + 1 * 60000); // 1 minuto
+    console.log("twilio", code)
+    await prisma.users.update({
+      where: { id: findUser.id },
+      data: {
+        twoFactorCode: code,
+        twoFactorExpires: expires,
+      },
     });
+
+    await sendSMS(process.env.MY_PHONE_NUMBER, code); //servicio de twilio
+
+    return res.status(200).json({
+      message: 'Verification code sent via SMS',
+      userId: findUser.id,
+    });
+
   } catch (error) {
     res.status(500).json({
       message: "Login failed",
+      error: error.message,
     });
+    
   }
+};
+
+const verifyTwoFactorCode = async (req, res) => {
+  const { userId, code } = req.body;
+
+  const user = await prisma.users.findUnique({ where: { id: userId } });
+
+  if (!user?.twoFactorCode || !user?.twoFactorExpires) {
+    return res.status(400).json({ message: "Invalid verification process" });
+  }
+  
+  const now = new Date();
+  if (user.twoFactorCode !== code || now > user.twoFactorExpires) {
+    return res.status(400).json({ message: "Invalid or expired verification code" });
+  }
+
+  // Código correcto: generar token
+  const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "2h" });
+
+  // Limpiar el código para seguridad
+  await prisma.users.update({
+    where: { id: user.id },
+    data: {
+      twoFactorCode: null,
+      twoFactorExpires: null,
+    },
+  });
+
+  return res.status(200).json({
+    message: "Login successful",
+    token,
+  });
 };
 
 module.exports = {
@@ -373,4 +413,5 @@ module.exports = {
   signIn,
   verifyCode,
   resendVerificationCode,
+  verifyTwoFactorCode
 };
