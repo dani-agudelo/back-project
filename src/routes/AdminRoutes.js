@@ -26,7 +26,7 @@ router.post(
   processCsv
 );
 
-router.post(
+router.get(
   "/validate-csv",
   authorizeRole("SUPERADMIN"),
   upload.single("file"),

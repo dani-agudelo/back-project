@@ -6,6 +6,8 @@ const prisma = new PrismaClient();
 const csv = require("csv-parser");
 const { Readable } = require("stream");
 const iconv = require("iconv-lite");
+const fs = require("fs");
+const path = require("path");
 
 const getDashboard = async (req, res) => {
   try {
@@ -57,38 +59,48 @@ const processCsv = async (req, res) => {
       })
       .on("end", async () => {
         try {
-          console.log("🧠 Procesando departamentos...");
+          console.log("🧠 Verificando y procesando departamentos...");
           const departments = Array.from(departmentsMap.values());
+          const existingDepartments = await prisma.departments.findMany({
+            where: {
+              name: { in: departments.map((dept) => dept.name) },
+            },
+          });
 
-          for (const dept of departments) {
-            try {
-              await prisma.departments.upsert({
-                where: { name: dept.name },
-                update: {},
-                create: { name: dept.name },
-              });
-              logs.push({
-                action: "create",
-                entity: "department",
-                message: `Department '${dept.name}' created successfully.`,
-              });
-            } catch (error) {
-              logs.push({
-                action: "error",
-                entity: "department",
-                message: `Failed to create department '${dept.name}': ${error.message}`,
-              });
-            }
+          const existingDepartmentNames = new Set(
+            existingDepartments.map((dept) => dept.name)
+          );
+
+          const missingDepartments = departments.filter(
+            (dept) => !existingDepartmentNames.has(dept.name)
+          );
+
+          for (const dept of missingDepartments) {
+            await prisma.departments.create({
+              data: { name: dept.name },
+            });
+            logs.push({
+              action: "create",
+              entity: "department",
+              message: `Department '${dept.name}' created successfully.`,
+            });
           }
 
-          console.log("🔍 Obteniendo IDs de departamentos...");
+          logs.push(
+            ...existingDepartments.map((dept) => ({
+              action: "exists",
+              entity: "department",
+              message: `Department '${dept.name}' already exists.`,
+            }))
+          );
+
+          console.log("🔍 Verificando ciudades...");
           const allDepartments = await prisma.departments.findMany();
           const departmentIdMap = new Map();
           allDepartments.forEach((dept) => {
             departmentIdMap.set(dept.name, dept.id);
           });
 
-          console.log("🏙️ Preparando datos de ciudades...");
           const citiesData = citiesDataRaw
             .map((city) => {
               const departmentId = departmentIdMap.get(city.department);
@@ -105,37 +117,49 @@ const processCsv = async (req, res) => {
               });
               return null;
             })
-            .filter(Boolean); // Elimina nulos si algún departamento no se encontró
+            .filter(Boolean);
 
-          console.log("💾 Insertando ciudades...");
-          for (const city of citiesData) {
-            try {
-              await prisma.cities.upsert({
-                where: { name: city.name },
-                update: {},
-                create: city,
-              });
-              logs.push({
-                action: "create",
-                entity: "city",
-                message: `City '${city.name}' created successfully.`,
-              });
-            } catch (error) {
-              logs.push({
-                action: "error",
-                entity: "city",
-                message: `Failed to create city '${city.name}': ${error.message}`,
-              });
-            }
+          const existingCities = await prisma.cities.findMany({
+            where: {
+              name: { in: citiesData.map((city) => city.name) },
+            },
+          });
+
+          const existingCityNames = new Set(
+            existingCities.map((city) => city.name)
+          );
+
+          const missingCities = citiesData.filter(
+            (city) => !existingCityNames.has(city.name)
+          );
+
+          for (const city of missingCities) {
+            await prisma.cities.create({
+              data: city,
+            });
+            logs.push({
+              action: "create",
+              entity: "city",
+              message: `City '${city.name}' created successfully.`,
+            });
           }
+
+          logs.push(
+            ...existingCities.map((city) => ({
+              action: "exists",
+              entity: "city",
+              message: `City '${city.name}' already exists.`,
+            }))
+          );
 
           // Guardar los logs en la base de datos
           await prisma.logs.createMany({ data: logs });
 
           res.status(200).json({
             message: "CSV processed successfully",
-            departments: departments.length,
-            cities: citiesData.length,
+            logs,
+            missingDepartments: missingDepartments.map((dept) => dept.name),
+            missingCities: missingCities.map((city) => city.name),
           });
         } catch (error) {
           console.error("❌ Error al guardar datos:", error);
@@ -154,53 +178,78 @@ const processCsv = async (req, res) => {
 
 const validateCsv = async (req, res) => {
   try {
-    const { file, goodCsv } = req.body;
-    if (!file || !goodCsv) {
-      return res.status(400).json({ message: "Both files are required" });
+    const goodCsvPath = path.join(
+      __dirname,
+      "../../data/departamentos_ciudades.csv"
+    );
+
+    if (!fs.existsSync(goodCsvPath)) {
+      return res.status(500).json({ message: "Good CSV file not found" });
     }
 
-    const uploadedBuffer = Buffer.from(file, "base64");
-    const goodBuffer = Buffer.from(goodCsv, "base64");
+    const goodDepartmentsMap = new Map();
+    const goodCitiesData = [];
 
-    const uploadedData = [];
-    const goodData = [];
+    // Leer y decodificar el archivo CSV "bueno" con latin1
+    const fileBuffer = fs.readFileSync(goodCsvPath);
+    const decodedBuffer = iconv.decode(fileBuffer, "latin1");
+    const stream = Readable.from(decodedBuffer);
 
-    Readable.from(uploadedBuffer.toString())
+    stream
       .pipe(csv())
       .on("data", (row) => {
-        uploadedData.push(row);
+        const normalizedRow = Object.keys(row).reduce((acc, key) => {
+          acc[key.toLowerCase()] = row[key];
+          return acc;
+        }, {});
+
+        const department =
+          normalizedRow["departamento"] || normalizedRow["department"];
+        const city = normalizedRow["municipio"] || normalizedRow["city"];
+
+        if (department && city) {
+          if (!goodDepartmentsMap.has(department)) {
+            goodDepartmentsMap.set(department, { name: department });
+          }
+
+          goodCitiesData.push({ name: city, department });
+        }
       })
-      .on("end", () => {
-        Readable.from(goodBuffer.toString())
-          .pipe(csv())
-          .on("data", (row) => {
-            goodData.push(row);
-          })
-          .on("end", () => {
-            const missingCities = goodData.filter(
-              (goodRow) =>
-                !uploadedData.some(
-                  (uploadedRow) =>
-                    uploadedRow.department === goodRow.department &&
-                    uploadedRow.city === goodRow.city
-                )
-            );
+      .on("end", async () => {
+        try {
+          const allDepartments = await prisma.departments.findMany();
+          const allCities = await prisma.cities.findMany();
 
-            if (missingCities.length > 0) {
-              return res.status(400).json({
-                message: "Uploaded CSV is missing cities",
-                missingCities,
-              });
-            }
+          const existingDepartmentNames = new Set(
+            allDepartments.map((dept) => dept.name)
+          );
+          const existingCityNames = new Set(allCities.map((city) => city.name));
 
-            res.status(200).json({ message: "CSV is valid" });
+          const missingDepartments = Array.from(
+            goodDepartmentsMap.values()
+          ).filter((dept) => !existingDepartmentNames.has(dept.name));
+
+          const missingCities = goodCitiesData.filter(
+            (city) => !existingCityNames.has(city.name)
+          );
+
+          res.status(200).json({
+            message: "Validation completed",
+            missingDepartments: missingDepartments.map((dept) => dept.name),
+            missingCities: missingCities.map((city) => city.name),
           });
+        } catch (error) {
+          console.error("❌ Error al validar datos:", error);
+          res
+            .status(500)
+            .json({ message: "Failed to validate data", error: error.message });
+        }
       });
   } catch (error) {
-    console.error("Error validating CSV:", error);
+    console.error("❌ Error al procesar CSV:", error);
     res
       .status(500)
-      .json({ message: "Failed to validate CSV", error: error.message });
+      .json({ message: "Error validating CSV", error: error.message });
   }
 };
 
