@@ -54,7 +54,7 @@ const sendVerificationEmail = async (email, code, fullname) => {
 
 // Función para registrar un nuevo usuario
 const signUp = async (req, res) => {
-  let { fullname, email, current_password } = req.body;
+  let { fullname, email, current_password, role } = req.body;
 
   if (email) {
     email = email.toLowerCase().trim();
@@ -110,6 +110,7 @@ const signUp = async (req, res) => {
         fullname,
         email,
         current_password: hashedPassword,
+        role: role || "EDITOR", // Asignar rol por defecto
         status: "PENDING",
         verificationCode,
         verificationCodeExpires: expirationTime,
@@ -354,6 +355,8 @@ const signIn = async (req, res) => {
         expiresIn: "2h",
       }
     );
+    console.log("Token generated:", token);
+
     res.status(200).json({
       message: "Login successfull",
       token,

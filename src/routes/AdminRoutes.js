@@ -5,15 +5,35 @@
 
 const express = require("express");
 const { authorizeRole } = require("../middlewares/authMiddleware");
-const { uploadFile, getDashboard } = require("../controllers/AdminController");
+const upload = require("../middlewares/uploadMiddleware");
+
+const {
+  uploadFile,
+  getDashboard,
+  processCsv,
+  validateCsv,
+} = require("../controllers/AdminController");
 
 const router = express.Router();
 
-console.log("AdminRoutes.js loaded", authorizeRole);
 // Ruta para subir archivos (solo SUPERADMIN)
 router.post("/upload", authorizeRole("SUPERADMIN"), uploadFile);
-
 // Ruta para acceder al dashboard (solo SUPERADMIN)
 router.get("/dashboard", authorizeRole("SUPERADMIN"), getDashboard);
+// Ruta para procesar el archivo CSV (solo SUPERADMIN)
+router.post(
+  "/process-csv",
+  authorizeRole("SUPERADMIN"),
+  upload.single("file"),
+  processCsv
+);
+
+// Ruta para validar el archivo CSV (solo SUPERADMIN)
+router.post(
+  "/validate-csv",
+  authorizeRole("SUPERADMIN"),
+  upload.single("file"),
+  validateCsv
+);
 
 module.exports = router;
