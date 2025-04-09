@@ -116,7 +116,6 @@ const signUp = async (req, res) => {
       },
     });
     console.log("Nodemailer transport:", nodemailer.createTransport);
-    console.log("SendMail function:", nodemailer.createTransport().sendMail);
 
     // Enviar correo con código de verificación
     console.log("Calling sendVerificationEmail...");
@@ -348,6 +347,7 @@ const signIn = async (req, res) => {
     const token = jwt.sign(
       {
         id: findUser.id,
+        role: findUser.role,
       },
       process.env.JWT_SECRET,
       {
