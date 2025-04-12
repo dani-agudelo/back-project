@@ -41,7 +41,7 @@ const getUserById = async (req, res) => {
       error: error.message,
     });
   }
-};
+};  
 
 module.exports = {
   getAllUsers,
