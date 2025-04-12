@@ -14,7 +14,7 @@ const path = require("path");
  *
  */
 const processCsv = async (req, res) => {
-  console.log("📥 Archivo recibido:", req.file);
+  console.log("Archivo recibido:", req.file);
   try {
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });
@@ -26,6 +26,7 @@ const processCsv = async (req, res) => {
     const departmentsMap = new Map();
     const citiesDataRaw = [];
 
+    // Leer y procesar el archivo CSV
     stream
       .pipe(csv())
       .on("data", (row) => {
@@ -48,78 +49,77 @@ const processCsv = async (req, res) => {
       })
       .on("end", async () => {
         try {
-          const departments = Array.from(departmentsMap.values());
-          const existingDepartments = await prisma.departments.findMany({
-            where: {
-              name: { in: departments.map((dept) => dept.name) },
-            },
-          });
+          // Obtener todos los departamentos y ciudades existentes en una sola consulta
+          const [existingDepartments, existingCities] = await Promise.all([
+            prisma.departments.findMany(),
+            prisma.cities.findMany(),
+          ]);
 
+          // Crear mapas para búsquedas rápidas
           const existingDepartmentNames = new Set(
             existingDepartments.map((dept) => dept.name)
           );
-
-          const missingDepartments = departments.filter(
-            (dept) => !existingDepartmentNames.has(dept.name)
-          );
-
-          for (const dept of missingDepartments) {
-            await prisma.departments.create({
-              data: { name: dept.name },
-            });
-          }
-
-          const allDepartments = await prisma.departments.findMany();
-          const departmentIdMap = new Map();
-          allDepartments.forEach((dept) => {
-            departmentIdMap.set(dept.name, dept.id);
-          });
-
-          const citiesData = citiesDataRaw
-            .map((city) => {
-              const departmentId = departmentIdMap.get(city.department);
-              if (departmentId) {
-                return {
-                  name: city.name,
-                  departmentId,
-                };
-              }
-              return null;
-            })
-            .filter(Boolean);
-
-          const existingCities = await prisma.cities.findMany({
-            where: {
-              name: { in: citiesData.map((city) => city.name) },
-            },
-          });
-
           const existingCityNames = new Set(
             existingCities.map((city) => city.name)
           );
 
-          const missingCities = citiesData.filter(
-            (city) => !existingCityNames.has(city.name)
-          );
+          // Identificar departamentos faltantes
+          const missingDepartments = [];
+          for (const [name, department] of departmentsMap.entries()) {
+            if (!existingDepartmentNames.has(name)) {
+              missingDepartments.push(department);
+            }
+          }
 
-          for (const city of missingCities) {
-            await prisma.cities.create({
-              data: city,
+          // Insertar departamentos faltantes en una sola operación
+          if (missingDepartments.length > 0) {
+            await prisma.departments.createMany({
+              data: missingDepartments,
+              skipDuplicates: true, // Evitar duplicados
             });
           }
 
+          // Actualizar el mapa de departamentos con IDs
+          const allDepartments = await prisma.departments.findMany();
+          const departmentIdMap = new Map(
+            allDepartments.map((dept) => [dept.name, dept.id])
+          );
+
+          // Identificar ciudades faltantes
+          const missingCities = [];
+          for (const city of citiesDataRaw) {
+            const departmentId = departmentIdMap.get(city.department);
+            if (departmentId && !existingCityNames.has(city.name)) {
+              missingCities.push({
+                name: city.name,
+                departmentId,
+              });
+            }
+          }
+
+          // Insertar ciudades faltantes en una sola operación
+          if (missingCities.length > 0) {
+            await prisma.cities.createMany({
+              data: missingCities,
+              skipDuplicates: true, // Evitar duplicados
+            });
+          }
+
+          // Responder con los resultados
           res.status(200).json({
             message: "CSV processed successfully",
             missingDepartments: missingDepartments.map((dept) => dept.name),
             missingCities: missingCities.map((city) => city.name),
           });
         } catch (error) {
+          console.error("Error al guardar datos:", error);
           res
             .status(500)
             .json({ message: "Failed to save data", error: error.message });
         }
       });
   } catch (error) {
+    console.error("Error al procesar CSV:", error);
     res
       .status(500)
       .json({ message: "Error processing CSV", error: error.message });
@@ -189,7 +189,7 @@ const validateCsv = async (req, res) => {
             missingCities: missingCities.map((city) => city.name),
           });
         } catch (error) {
-          console.error("❌ Error al validar datos:", error);
+          console.error(" Error al validar datos:", error);
           res
             .status(500)
             .json({ message: "Failed to validate data", error: error.message });
@@ -209,10 +209,10 @@ const validateCsv = async (req, res) => {
  */
 const getCitiesAndDepartments = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query; // Parámetros de paginación (valores predeterminados: página 1, 10 elementos por página)
+    const { page = 1, limit = 10 } = req.query; 
 
-    const skip = (page - 1) * limit; // Calcular cuántos registros omitir
-    const take = parseInt(limit); // Número de registros a devolver
+    const skip = (page - 1) * limit;
+    const take = parseInt(limit); 
 
     // Obtener ciudades con sus departamentos
     const cities = await prisma.cities.findMany({

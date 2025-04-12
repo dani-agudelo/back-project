@@ -1,0 +1,572 @@
+DEPARTAMENTO,MUNICIPIO
+Antioquia,Andes
+Antioquia,Angelópolis
+Antioquia,Angostura
+Antioquia,Anorí
+Boyacá,Tununguá
+Antioquia,Anza
+Antioquia,Apartadó
+Antioquia,Arboletes
+Antioquia,Argelia
+Antioquia,Armenia
+Antioquia,Barbosa
+Antioquia,Bello
+Antioquia,Betania
+Antioquia,Betulia
+Antioquia,Ciudad Bolívar
+Antioquia,Briceño
+Antioquia,Buriticá
+Antioquia,Cáceres
+Antioquia,Caicedo
+Antioquia,Caldas
+Antioquia,Campamento
+Antioquia,Cañasgordas
+Antioquia,Caracolí
+Antioquia,Caramanta
+Antioquia,Carepa
+Boyacá,Motavita
+Antioquia,Carolina
+Antioquia,Caucasia
+Antioquia,Chigorodó
+Antioquia,Cisneros
+Antioquia,Cocorná
+Antioquia,Concepción
+Antioquia,Concordia
+Antioquia,Copacabana
+Antioquia,Dabeiba
+Antioquia,Don Matías
+Antioquia,Ebéjico
+Antioquia,El Bagre
+Antioquia,Entrerrios
+Antioquia,Envigado
+Antioquia,Fredonia
+Córdoba,San Bernardo del Viento
+Antioquia,Giraldo
+Antioquia,Girardota
+Antioquia,Gómez Plata
+Chocó,Istmina
+Antioquia,Guadalupe
+Antioquia,Guarne
+Antioquia,Guatapé
+Antioquia,Heliconia
+Antioquia,Hispania
+Antioquia,Itagui
+Antioquia,Ituango
+Antioquia,Belmira
+Antioquia,Jericó
+Antioquia,La Ceja
+Antioquia,La Estrella
+Antioquia,La Pintada
+Antioquia,La Unión
+Antioquia,Liborina
+Antioquia,Maceo
+Antioquia,Marinilla
+Antioquia,Montebello
+Antioquia,Murindó
+Antioquia,Mutatá
+Antioquia,Nariño
+Antioquia,Necoclí
+Antioquia,Nechí
+Antioquia,Olaya
+Antioquia,Peñol
+Antioquia,Peque
+Antioquia,Pueblorrico
+Antioquia,Puerto Berrío
+Antioquia,Puerto Nare
+Antioquia,Puerto Triunfo
+Antioquia,Remedios
+Antioquia,Retiro
+Antioquia,Rionegro
+Antioquia,Sabanalarga
+Antioquia,Sabaneta
+Antioquia,Salgar
+Boyacá,Ciénega
+Nariño,Santacruz
+Antioquia,San Francisco
+Antioquia,San Jerónimo
+Santander,Puerto Wilches
+Santander,Puerto Parra
+Antioquia,San Luis
+Antioquia,San Pedro
+Antioquia,San Rafael
+Antioquia,San Roque
+Antioquia,San Vicente
+Antioquia,Santa Bárbara
+Antioquia,Santo Domingo
+Antioquia,El Santuario
+Antioquia,Segovia
+Antioquia,Sopetrán
+Meta,Uribe
+Antioquia,Támesis
+Antioquia,Tarazá
+Antioquia,Tarso
+Antioquia,Titiribí
+Antioquia,Toledo
+Antioquia,Turbo
+Antioquia,Uramita
+Antioquia,Urrao
+Antioquia,Valdivia
+Antioquia,Valparaíso
+Antioquia,Vegachí
+Antioquia,Venecia
+Antioquia,Yalí
+Antioquia,Yarumal
+Antioquia,Yolombó
+Antioquia,Yondó
+Antioquia,Zaragoza
+Atlántico,Barranquilla
+Atlántico,Baranoa
+Atlántico,Candelaria
+Atlántico,Galapa
+Atlántico,Luruaco
+Atlántico,Malambo
+Atlántico,Manatí
+Atlántico,Piojó
+Atlántico,Polonuevo
+Atlántico,Sabanagrande
+Atlántico,Sabanalarga
+Atlántico,Santa Lucía
+Atlántico,Santo Tomás
+Atlántico,Soledad
+Atlántico,Suan
+Atlántico,Tubará
+Atlántico,Usiacurí
+Bolívar,Achí
+Bolívar,Arenal
+Bolívar,Arjona
+Bolívar,Arroyohondo
+Bolívar,Calamar
+Bolívar,Cantagallo
+Bolívar,Cicuco
+Bolívar,Córdoba
+Bolívar,Clemencia
+Bolívar,El Guamo
+Bolívar,Magangué
+Bolívar,Mahates
+Bolívar,Margarita
+Bolívar,Montecristo
+Bolívar,Mompós
+Bolívar,Morales
+Bolívar,Norosí
+Bolívar,Pinillos
+Bolívar,Regidor
+Bolívar,Río Viejo
+Bolívar,San Estanislao
+Bolívar,San Fernando
+Bolívar,San Juan Nepomuceno
+Bolívar,Santa Catalina
+Bolívar,Santa Rosa
+Bolívar,Simití
+Bolívar,Soplaviento
+Bolívar,Talaigua Nuevo
+Bolívar,Tiquisio
+Bolívar,Turbaco
+Bolívar,Turbaná
+Bolívar,Villanueva
+Boyacá,Tunja
+Boyacá,Almeida
+Boyacá,Aquitania
+Boyacá,Arcabuco
+Boyacá,Berbeo
+Boyacá,Betéitiva
+Boyacá,Boavita
+Boyacá,Boyacá
+Boyacá,Briceño
+Boyacá,Buena Vista
+Boyacá,Busbanzá
+Boyacá,Caldas
+Boyacá,Campohermoso
+Boyacá,Cerinza
+Boyacá,Chinavita
+Boyacá,Chiquinquirá
+Boyacá,Chiscas
+Boyacá,Chita
+Boyacá,Chitaraque
+Boyacá,Chivatá
+Boyacá,Cómbita
+Boyacá,Coper
+Boyacá,Corrales
+Boyacá,Covarachía
+Boyacá,Cubará
+Boyacá,Cucaita
+Boyacá,Cuítiva
+Boyacá,Chíquiza
+Boyacá,Chivor
+Boyacá,Duitama
+Boyacá,El Cocuy
+Boyacá,El Espino
+Boyacá,Firavitoba
+Boyacá,Floresta
+Boyacá,Gachantivá
+Boyacá,Gameza
+Boyacá,Garagoa
+Boyacá,Guacamayas
+Boyacá,Guateque
+Boyacá,Guayatá
+Boyacá,Güicán
+Boyacá,Iza
+Boyacá,Jenesano
+Boyacá,Jericó
+Boyacá,Labranzagrande
+Boyacá,La Capilla
+Boyacá,La Victoria
+Boyacá,Macanal
+Boyacá,Maripí
+Boyacá,Miraflores
+Boyacá,Mongua
+Boyacá,Monguí
+Boyacá,Moniquirá
+Boyacá,Muzo
+Boyacá,Nobsa
+Boyacá,Nuevo Colón
+Boyacá,Oicatá
+Boyacá,Otanche
+Boyacá,Pachavita
+Boyacá,Páez
+Boyacá,Paipa
+Boyacá,Pajarito
+Boyacá,Panqueba
+Boyacá,Pauna
+Boyacá,Paya
+Boyacá,Pesca
+Boyacá,Pisba
+Boyacá,Puerto Boyacá
+Boyacá,Quípama
+Boyacá,Ramiriquí
+Boyacá,Ráquira
+Boyacá,Rondón
+Boyacá,Saboyá
+Boyacá,Sáchica
+Boyacá,Samacá
+Boyacá,San Eduardo
+Boyacá,San Mateo
+Boyacá,Santana
+Boyacá,Santa María
+Boyacá,Santa Sofía
+Boyacá,Sativanorte
+Boyacá,Sativasur
+Boyacá,Siachoque
+Boyacá,Soatá
+Boyacá,Socotá
+Boyacá,Socha
+Boyacá,Sogamoso
+Boyacá,Somondoco
+Boyacá,Sora
+Boyacá,Sotaquirá
+Boyacá,Soracá
+Boyacá,Susacón
+Boyacá,Sutamarchán
+Boyacá,Sutatenza
+Boyacá,Tasco
+Boyacá,Tenza
+Boyacá,Tibaná
+Boyacá,Tinjacá
+Boyacá,Tipacoque
+Boyacá,Toca
+Boyacá,Tópaga
+Boyacá,Tota
+Boyacá,Turmequé
+Boyacá,Tutazá
+Boyacá,Umbita
+Boyacá,Ventaquemada
+Boyacá,Viracachá
+Boyacá,Zetaquira
+Caldas,Manizales
+Caldas,Aguadas
+Caldas,Anserma
+Caldas,Aranzazu
+Caldas,Belalcázar
+Caldas,Chinchiná
+Caldas,Filadelfia
+Caldas,La Dorada
+Caldas,La Merced
+Caldas,Manzanares
+Caldas,Marmato
+Caldas,Marulanda
+Caldas,Neira
+Caldas,Norcasia
+Caldas,Pácora
+Caldas,Palestina
+Caldas,Pensilvania
+Caldas,Riosucio
+Caldas,Risaralda
+Caldas,Salamina
+Caldas,Samaná
+Caldas,San José
+Caldas,Supía
+Caldas,Victoria
+Caldas,Villamaría
+Caldas,Viterbo
+Caquetá,Florencia
+Caquetá,Albania
+Caquetá,Curillo
+Caquetá,El Doncello
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+Cundinamarca,Madrid
+Cundinamarca,Manta
+Cundinamarca,Medina
+Cundinamarca,Mosquera
+Cundinamarca,Nariño
+Cundinamarca,Nemocón
+Cundinamarca,Nilo
+Cundinamarca,Nimaima
+Cundinamarca,Nocaima
+Cundinamarca,Venecia
+Cundinamarca,Pacho
+Cundinamarca,Paime
+Cundinamarca,Pandi
+Cundinamarca,Paratebueno
+Cundinamarca,Pasca
+Cundinamarca,Puerto Salgar
+Cundinamarca,Pulí
+Cundinamarca,Quebradanegra
+Cundinamarca,Quetame
+Cundinamarca,Quipile
+Cundinamarca,Apulo
+Cundinamarca,Ricaurte
+Cundinamarca,San Bernardo
+Cundinamarca,San Cayetano
+Cundinamarca,San Francisco
+Cundinamarca,Sesquilé
+Cundinamarca,Sibaté
+Cundinamarca,Silvania
+Cundinamarca,Simijaca
+Cundinamarca,Soacha
+Cundinamarca,Subachoque
+Cundinamarca,Suesca
+Cundinamarca,Supatá
+Cundinamarca,Susa
+Cundinamarca,Sutatausa
+Cundinamarca,Tabio
+Cundinamarca,Tausa
+Cundinamarca,Tena
+Cundinamarca,Tenjo
+Cundinamarca,Tibacuy
+Cundinamarca,Tibirita
+Cundinamarca,Tocaima
+Cundinamarca,Tocancipá
+Cundinamarca,Topaipí
+Cundinamarca,Ubalá
+Cundinamarca,Ubaque
+Cundinamarca,Une
+Cundinamarca,Útica
+Cundinamarca,Vianí
+Cundinamarca,Villagómez
+Cundinamarca,Villapinzón
+Cundinamarca,Villeta
+Cundinamarca,Viotá
+Cundinamarca,Zipacón
+Chocó,Quibdó
+Chocó,Acandí
+Chocó,Alto Baudo
+Chocó,Atrato
+Chocó,Bagadó
+Chocó,Bahía Solano
+Chocó,Bajo Baudó
+Chocó,Bojaya
+Chocó,Cértegui
+Chocó,Condoto
+Chocó,Juradó
+Chocó,Lloró
+Chocó,Medio Atrato
+Chocó,Medio Baudó
+Chocó,Medio San Juan
+Chocó,Nóvita
+Chocó,Nuquí
+Chocó,Río Iro
+Chocó,Río Quito
+Chocó,Riosucio
+Chocó,Sipí
+Chocó,Unguía
+Huila,Neiva
+Huila,Acevedo
+Huila,Agrado
+Huila,Aipe
+Huila,Algeciras
+Huila,Altamira
+Huila,Baraya
+Huila,Campoalegre
+Huila,Colombia
+Huila,Elías
+Huila,Garzón
+Huila,Gigante
+Huila,Guadalupe
+Huila,Hobo
+Huila,Iquira
+Huila,Isnos
+Huila,La Argentina
+Huila,La Plata
+Huila,Nátaga
+Huila,Oporapa
+Huila,Paicol
+Huila,Palermo
+Huila,Palestina
+Huila,Pital
+Huila,Pitalito
+Huila,Rivera
+Huila,Saladoblanco
+Huila,Santa María
+Huila,Suaza
+Huila,Tarqui
+Huila,Tesalia
+Huila,Tello
+Huila,Teruel
+Huila,Timaná
+Huila,Villavieja
+Huila,Yaguará
+La Guajira,Riohacha
+La Guajira,Albania
+La Guajira,Barrancas
+La Guajira,Dibula
+La Guajira,Distracción
+La Guajira,El Molino
+La Guajira,Fonseca
+La Guajira,Hatonuevo
+La Guajira,Maicao
+La Guajira,Manaure
+La Guajira,Uribia
+La Guajira,Urumita
+La Guajira,Villanueva
+Magdalena,Santa Marta
+Magdalena,Algarrobo
+Magdalena,Aracataca
+Magdalena,Ariguaní
+Magdalena,Cerro San Antonio
+Magdalena,Chivolo
+Magdalena,Concordia
+Magdalena,El Banco
+Magdalena,El Piñon
