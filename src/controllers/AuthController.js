@@ -345,6 +345,7 @@ const signIn = async (req, res) => {
     }
 
     // Generate token
+    
     const token = jwt.sign(
       {
         id: findUser.id,
